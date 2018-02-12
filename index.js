@@ -5,7 +5,9 @@ const sort = arr => arr.sort((a, b) => {
   a = a.split(':').map(k => parseFloat(k))[0]
   b = b.split(':').map(k => parseFloat(k))[0]
   if (a < b) return -1
+  /* istanbul ignore else */
   if (b < a) return 1
+  /* istanbul ignore next */
   if (b === a) return 0
 })
 const values = obj => sort(Object.keys(obj)).map(key => obj[key])
@@ -18,6 +20,7 @@ gza`
 const header = settings => {
   let speakers = new Map()
   values(settings.transcript).forEach(section => {
+    /* istanbul ignore else */
     if (!speakers.has(section.speaker)) {
       // TODO: handle not string names
       let elem = document.createElement('compretend-speaker')
@@ -30,37 +33,22 @@ const header = settings => {
 
 const paragraph = async settings => {
   let transcript = await settings.waitFor('transcript')
-  let mutate = await settings.waitFor('mutate')
   let words = []
-  let last = null
   sort(Object.keys(transcript)).forEach(timespan => {
     let [start, end] = timespan.split(':')
     let word = transcript[timespan]
     let elem = document.createElement('span')
     elem.className = 'word'
     elem.textContent = word
+    elem.start = start
+    elem.end = end
     words.push(elem)
-    last = end
   })
   return words
 }
 
 gza`
-${async element => {
-  let timespan = await element.waitFor('timespan')
-  let edit = await element.waitFor('edit')
-  element.mutate = change => {
-    let c = {}
-    c[timespan] = change
-    edit({
-      type: 'update',
-      key: [timespan, 'transcript',  change.set],
-      prev: change.prev,
-      value: change.value
-    })
-  }
-}}
-<compretend-section ${['transcript', 'timespan', 'mutate']}>
+<compretend-section ${['transcript', 'timespan']}>
 </compretend-section>
 <style>
 span.word {
@@ -70,7 +58,7 @@ span.word {
 </style>
 <div class="section">
   <p>
-  ${ paragraph }
+  ${paragraph}
   </p>
 </div>
 `
@@ -87,10 +75,6 @@ const sections = async settings => {
     elem.end = parseFloat(end)
     elem.id = `section-${timespan}`
     elem.speaker = section.speaker
-    elem.edit = async change => {
-      let doc = await settings.waitFor('doc')
-      doc.ref.collection('transcriptHistory').add({changes: [change]})
-    }
     elem.transcript = section.transcript
     ret.push(elem)
   })
@@ -108,6 +92,8 @@ ${async element => {
   let res = await fetch(transcriptUrl)
   let transcript = await res.json()
   element.addSetting('transcript', transcript)
+  element.audio = document.createElement('audio')
+  element.audio.src = audiourl
 }}
 <compretend-audio ${['account', 'filename']}>
 </compretend-audio>
@@ -115,9 +101,9 @@ ${async element => {
 div.sections
 </style>
 <div class="header">
-  ${ header }
+  ${header}
 </div>
 <div class="sections">
-  ${ sections }
+  ${sections}
 </div>
 `
