@@ -95,14 +95,25 @@ div.speaker-content {
 div.speaker-name {
   width: 100%;
   flex-grow: 1;
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 div.text:first-letter {
   text-transform: capitalize
 }
+div.text {
+  z-index: -100;
+  margin-top: 20px;
+  margin-bottom: -5px;
+  margin-left: -35px;
+  padding-left: 35px;
+  border-left: 2px dotted black;
+}
+div.speaker-name h4 {
+  margin-bottom: 15px;
+  margin-top: 15px
+}
 span.playing {
-  font-weight: bold;
+  font-weight: 600;
+  letter-spacing: -0.065em;
 }
 </style>
 <div class="section">
@@ -111,7 +122,7 @@ span.playing {
   </div>
   <div class="speaker-content">
     <div class="speaker-name">
-      <div>${settings => settings.speaker}</div>
+      <h4>${settings => settings.speaker}</h4>
     </div>
     <div class="text">
       ${settings => settings.text}
@@ -185,6 +196,10 @@ ${async element => {
     cl(spans[i]).remove('playing')
   }
   element.spans = spans
+
+  let last = element.sections[element.sections.length - 1]
+  await last.nextRender()
+  last.shadowRoot.querySelector('div.text').style = 'border-left: none;'
 }}
 <compretend-audio ${['account', 'filename']}>
 </compretend-audio>
@@ -196,14 +211,10 @@ div.sections {
   width: 100%;
 }
 :host:after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 20px;
-  bottom: 0;
-  left: 38px;
-  border-left: 2px dotted black;
-  transform: translate(-50%);
+
+}
+:host {
+  font-family: Verdana, Geneva, sans-serif;
 }
 </style>
 <div class="header">
