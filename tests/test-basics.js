@@ -8,7 +8,7 @@ test('basic file', async (page, t) => {
   await page.evaluate(async () => {
     document.body.innerHTML += `
     <compretend-audio
-      account="x9UAnPSQPxeeEcXeiYPysOfco3T2"
+      account="cYahuVpWBlg1gfamVTctazb5PGL2"
       filename="alex-russell-short.mp3">
     </compretend-audio>
     `
@@ -23,7 +23,7 @@ test('play transcript', async (page, t) => {
   let pos = await page.evaluate(async () => {
     document.body.innerHTML += `
     <compretend-audio
-      account="x9UAnPSQPxeeEcXeiYPysOfco3T2"
+      account="cYahuVpWBlg1gfamVTctazb5PGL2"
       filename="alex-russell-short.mp3">
     </compretend-audio>
     `

@@ -49,6 +49,8 @@ const paragraph = transcript => {
 
 gza`
 ${async element => {
+  let avatar = element.avatar || `https://api.adorable.io/avatars/280/${encodeURIComponent(element.speaker)}.png`
+  element.avatar = avatar
   element.text = paragraph(await element.waitFor('transcript'))
   element.text.forEach(elem => {
     elem.onclick = () => {
@@ -58,7 +60,7 @@ ${async element => {
   })
 }}
 <compretend-section ${
-  ['transcript', 'timespan', 'speaker', 'text', 'audio']
+  ['transcript', 'timespan', 'speaker', 'text', 'audio', 'avatar']
 }>
 </compretend-section>
 <style>
@@ -118,7 +120,7 @@ span.playing {
 </style>
 <div class="section">
   <div class="speaker">
-    <img src="https://api.adorable.io/avatars/280/${settings => settings.speaker}.png"><img>
+    <img src="${settings => settings.avatar}"><img>
   </div>
   <div class="speaker-content">
     <div class="speaker-name">
@@ -142,8 +144,14 @@ const sections = (transcript, audio) => {
     elem.end = parseFloat(end)
     elem.id = `section-${timespan}`
     elem.audio = audio
+    if (typeof section.speaker === 'number') {
+      elem.speaker = `Speaker ${section.speaker}`
+    } else {
+      elem.speaker = section.speaker.name
+      elem.avatar = section.speaker.avatar
+    }
     // if (typeof section.speaker === 'number') {
-    elem.speaker = `Speaker ${section.speaker}`
+
     // } else {
     //   elem.speaker = section.speaker
     // }
